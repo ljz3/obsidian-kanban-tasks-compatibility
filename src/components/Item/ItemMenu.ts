@@ -211,7 +211,8 @@ export function useItemMenu({
           i.setIcon('lucide-x')
             .setTitle(t('Remove date'))
             .onClick(() => {
-              const emojiDateRegex = /📅 *\d{4}-\d{2}-\d{2}/;
+              // Use Unicode escape for 📅 (U+1F4C5) for cross-platform compatibility
+              const emojiDateRegex = /\u{1F4C5} *\d{4}-\d{2}-\d{2}/u;
               const titleRaw = item.data.titleRaw.replace(emojiDateRegex, '').trim();
 
               boardModifiers.updateItem(path, stateManager.updateItemContent(item, titleRaw));

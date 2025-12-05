@@ -111,7 +111,8 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
   };
 
   // Extract emoji date using regex before AST processing
-  const emojiDateMatch = itemContent.match(/📅 *(\d{4}-\d{2}-\d{2})/);
+  // Use Unicode escape for 📅 (U+1F4C5) for cross-platform compatibility
+  const emojiDateMatch = itemContent.match(/\u{1F4C5} *(\d{4}-\d{2}-\d{2})/u);
   if (emojiDateMatch) {
     itemData.metadata.dateStr = emojiDateMatch[1];
     if (moveDates) {

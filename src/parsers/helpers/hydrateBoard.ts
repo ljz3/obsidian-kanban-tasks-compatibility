@@ -38,13 +38,14 @@ export function preprocessTitle(stateManager: StateManager, title: string) {
   };
 
   // Handle emoji date format
-  title = title.replace(/📅 *(\d{4}-\d{2}-\d{2})/g, (match, content) => {
+  // Use Unicode escape for 📅 (U+1F4C5) for cross-platform compatibility
+  title = title.replace(/\u{1F4C5} *(\d{4}-\d{2}-\d{2})/gu, (match, content) => {
     const parsed = moment(content, dateFormat);
     if (!parsed.isValid()) return match;
     date = parsed;
     if (!dateColor) dateColor = getDateColor(parsed);
     const { wrapperClass, wrapperStyle } = getWrapperStyles(c('preview-date-wrapper'));
-    return `<span data-date="${date.toISOString()}" class="${wrapperClass} ${c('date')}"${wrapperStyle}><span class="${c('preview-date')} ${c('item-metadata-date')}">📅 ${parsed.format(dateDisplayFormat)}</span></span>`;
+    return `<span data-date="${date.toISOString()}" class="${wrapperClass} ${c('date')}"${wrapperStyle}><span class="${c('preview-date')} ${c('item-metadata-date')}">\u{1F4C5} ${parsed.format(dateDisplayFormat)}</span></span>`;
   });
 
   title = title.replace(

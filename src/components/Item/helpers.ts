@@ -99,12 +99,13 @@ export function constructMenuDatePickerOnChange({
   path,
 }: ConstructMenuDatePickerOnChangeParams) {
   const dateFormat = stateManager.getSetting('date-format');
-  const emojiDateRegex = /📅 *\d{4}-\d{2}-\d{2}/;
+  // Use Unicode escape for 📅 (U+1F4C5) for cross-platform compatibility
+  const emojiDateRegex = /\u{1F4C5} *\d{4}-\d{2}-\d{2}/u;
 
   return (dates: Date[]) => {
     const date = dates[0];
     const formattedDate = moment(date).format(dateFormat);
-    const emojiDate = `📅 ${formattedDate}`;
+    const emojiDate = `\u{1F4C5} ${formattedDate}`;
 
     let titleRaw = item.data.titleRaw;
 
