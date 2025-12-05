@@ -110,6 +110,19 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
     checkChar: item.checked ? item.checkChar || ' ' : ' ',
   };
 
+  // Extract emoji date using regex before AST processing
+  const emojiDateMatch = itemContent.match(/📅 *(\d{4}-\d{2}-\d{2})/);
+  if (emojiDateMatch) {
+    itemData.metadata.dateStr = emojiDateMatch[1];
+    if (moveDates) {
+      const emojiDateFullMatch = emojiDateMatch[0];
+      const index = itemContent.indexOf(emojiDateFullMatch);
+      if (index !== -1) {
+        title = itemContent.slice(0, index) + itemContent.slice(index + emojiDateFullMatch.length);
+      }
+    }
+  }
+
   visit(
     item,
     (node) => {
@@ -143,7 +156,10 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
       }
 
       if (genericNode.type === 'date' || genericNode.type === 'dateLink' || genericNode.type === 'emojiDate') {
-        itemData.metadata.dateStr = (genericNode as DateNode).date;
+        // Skip if we already extracted emoji date
+        if (!itemData.metadata.dateStr) {
+          itemData.metadata.dateStr = (genericNode as DateNode).date;
+        }
 
         if (moveDates) {
           title = markRangeForDeletion(title, {

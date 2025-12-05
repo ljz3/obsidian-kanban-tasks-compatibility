@@ -5,22 +5,36 @@ import { Effects, Extension, State } from 'micromark-util-types';
 import { getSelf } from './helpers';
 
 export function emojiDateExtension(emoji: string): Extension {
-  const emojiCode = emoji.codePointAt(0);
+  // Emoji 📅 is U+1F4C5 - code point 128197
+  // In UTF-16, this requires a surrogate pair
+  const HIGH_SURROGATE = 0xd83d; // High surrogate for 📅
+  const LOW_SURROGATE = 0xdcc5; // Low surrogate for 📅
 
   function tokenize(effects: Effects, ok: State, nok: State) {
     let dateChars = 0;
+    let seenHighSurrogate = false;
 
     return start;
 
     function start(code: number) {
-      if (code !== emojiCode) return nok(code);
+      // Check for high surrogate
+      if (code === HIGH_SURROGATE) {
+        effects.enter('emojiDate' as any);
+        effects.enter('emojiDateMarker' as any);
+        effects.consume(code);
+        seenHighSurrogate = true;
+        return checkLowSurrogate;
+      }
+      return nok(code);
+    }
 
-      effects.enter('emojiDate' as any);
-      effects.enter('emojiDateMarker' as any);
-      effects.consume(code);
-      effects.exit('emojiDateMarker' as any);
-
-      return afterEmoji;
+    function checkLowSurrogate(code: number) {
+      if (code === LOW_SURROGATE) {
+        effects.consume(code);
+        effects.exit('emojiDateMarker' as any);
+        return afterEmoji;
+      }
+      return nok(code);
     }
 
     function afterEmoji(code: number) {
@@ -63,7 +77,7 @@ export function emojiDateExtension(emoji: string): Extension {
   }
 
   return {
-    text: { [emojiCode]: { tokenize } },
+    text: { [HIGH_SURROGATE]: { tokenize } },
   };
 }
 
