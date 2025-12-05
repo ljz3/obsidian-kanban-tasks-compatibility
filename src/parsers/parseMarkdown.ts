@@ -8,6 +8,7 @@ import { getNormalizedPath } from 'src/helpers/renderMarkdown';
 
 import { frontmatterKey, getLinkedPageMetadata } from './common';
 import { blockidExtension, blockidFromMarkdown } from './extensions/blockid';
+import { emojiDateExtension, emojiDateFromMarkdown } from './extensions/emojiDate';
 import { genericWrappedExtension, genericWrappedFromMarkdown } from './extensions/genericWrapped';
 import { internalMarkdownLinks } from './extensions/internalMarkdownLink';
 import { tagExtension, tagFromMarkdown } from './extensions/tag';
@@ -65,8 +66,7 @@ function extractSettingsFooter(md: string) {
 function getExtensions(stateManager: StateManager) {
   return [
     gfmTaskListItem,
-    genericWrappedExtension('date', `${stateManager.getSetting('date-trigger')}{`, '}'),
-    genericWrappedExtension('dateLink', `${stateManager.getSetting('date-trigger')}[[`, ']]'),
+    emojiDateExtension('📅'),
     genericWrappedExtension('time', `${stateManager.getSetting('time-trigger')}{`, '}'),
     genericWrappedExtension('embedWikilink', '![[', ']]'),
     genericWrappedExtension('wikilink', '[[', ']]'),
@@ -78,14 +78,7 @@ function getExtensions(stateManager: StateManager) {
 function getMdastExtensions(stateManager: StateManager) {
   return [
     gfmTaskListItemFromMarkdown,
-    genericWrappedFromMarkdown('date', (text, node) => {
-      if (!text) return;
-      node.date = text;
-    }),
-    genericWrappedFromMarkdown('dateLink', (text, node) => {
-      if (!text) return;
-      node.date = text;
-    }),
+    emojiDateFromMarkdown(),
     genericWrappedFromMarkdown('time', (text, node) => {
       if (!text) return;
       node.time = text;

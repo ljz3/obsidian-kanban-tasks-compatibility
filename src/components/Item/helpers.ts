@@ -99,26 +99,19 @@ export function constructMenuDatePickerOnChange({
   path,
 }: ConstructMenuDatePickerOnChangeParams) {
   const dateFormat = stateManager.getSetting('date-format');
-  const shouldLinkDates = stateManager.getSetting('link-date-to-daily-note');
-  const dateTrigger = stateManager.getSetting('date-trigger');
-  const contentMatch = shouldLinkDates
-    ? '(?:\\[[^\\]]+\\]\\([^)]+\\)|\\[\\[[^\\]]+\\]\\])'
-    : '{[^}]+}';
-  const dateRegEx = new RegExp(`(^|\\s)${escapeRegExpStr(dateTrigger as string)}${contentMatch}`);
+  const emojiDateRegex = /📅 *\d{4}-\d{2}-\d{2}/;
 
   return (dates: Date[]) => {
     const date = dates[0];
     const formattedDate = moment(date).format(dateFormat);
-    const wrappedDate = shouldLinkDates
-      ? buildLinkToDailyNote(stateManager.app, formattedDate)
-      : `{${formattedDate}}`;
+    const emojiDate = `📅 ${formattedDate}`;
 
     let titleRaw = item.data.titleRaw;
 
     if (hasDate) {
-      titleRaw = item.data.titleRaw.replace(dateRegEx, `$1${dateTrigger}${wrappedDate}`);
+      titleRaw = item.data.titleRaw.replace(emojiDateRegex, emojiDate);
     } else {
-      titleRaw = `${item.data.titleRaw} ${dateTrigger}${wrappedDate}`;
+      titleRaw = `${item.data.titleRaw} ${emojiDate}`;
     }
 
     boardModifiers.updateItem(path, stateManager.updateItemContent(item, titleRaw));

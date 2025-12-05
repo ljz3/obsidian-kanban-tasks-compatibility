@@ -211,16 +211,8 @@ export function useItemMenu({
           i.setIcon('lucide-x')
             .setTitle(t('Remove date'))
             .onClick(() => {
-              const shouldLinkDates = stateManager.getSetting('link-date-to-daily-note');
-              const dateTrigger = stateManager.getSetting('date-trigger');
-              const contentMatch = shouldLinkDates
-                ? '(?:\\[[^\\]]+\\]\\([^\\)]+\\)|\\[\\[[^\\]]+\\]\\])'
-                : '{[^}]+}';
-              const dateRegEx = new RegExp(
-                `(^|\\s)${escapeRegExpStr(dateTrigger as string)}${contentMatch}`
-              );
-
-              const titleRaw = item.data.titleRaw.replace(dateRegEx, '').trim();
+              const emojiDateRegex = /📅 *\d{4}-\d{2}-\d{2}/;
+              const titleRaw = item.data.titleRaw.replace(emojiDateRegex, '').trim();
 
               boardModifiers.updateItem(path, stateManager.updateItemContent(item, titleRaw));
             });

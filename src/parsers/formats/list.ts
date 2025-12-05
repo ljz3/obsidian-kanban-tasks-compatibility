@@ -142,7 +142,7 @@ export function listItemToItemData(stateManager: StateManager, md: string, item:
         return true;
       }
 
-      if (genericNode.type === 'date' || genericNode.type === 'dateLink') {
+      if (genericNode.type === 'date' || genericNode.type === 'dateLink' || genericNode.type === 'emojiDate') {
         itemData.metadata.dateStr = (genericNode as DateNode).date;
 
         if (moveDates) {
